@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jehyun | PM Portfolio</title>
+    <script>
+      // GitHub Pages SPA fallback: restore the path encoded by 404.html
+      // before react-router mounts.
+      ;(function (l) {
+        if (l.search[1] === '/') return
+        var decoded = (l.search[0] === '?' ? l.search.slice(1) : l.search)
+          .split('&')
+          .map(function (s) {
+            return s.replace(/~and~/g, '&')
+          })
+        var params = {}
+        decoded.forEach(function (pair) {
+          var kv = pair.split('=')
+          params[kv[0]] = kv[1]
+        })
+        if (params.p !== undefined) {
+          window.history.replaceState(
+            null,
+            '',
+            l.pathname.replace(/\/$/, '') +
+              '/' +
+              (params.p || '') +
+              (params.q ? '?' + params.q : '') +
+              l.hash,
+          )
+        }
+      })(window.location)
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
