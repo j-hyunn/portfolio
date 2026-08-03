@@ -1,4 +1,20 @@
-import { career, careerIntro, type CareerEntry } from '@/data/career'
+import { ChevronRight, ExternalLink, X } from 'lucide-react'
+
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
+import {
+  career,
+  careerIntro,
+  type CareerEntry,
+  type CareerProject,
+} from '@/data/career'
 
 const monthAbbr = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -96,6 +112,190 @@ const dotClass: Record<Tone, string> = {
   none: 'bg-muted-foreground/40',
 }
 
+// 프로젝트 카드. 카드 자체가 트리거라, 클릭하면 커리어 드로어 위로 중첩 드로어가 쌓인다.
+function ProjectCard({ project }: { project: CareerProject }) {
+  const sections = project.sections ?? []
+
+  return (
+    <Drawer swipeDirection="right">
+      <DrawerTrigger className="group bg-muted/60 hover:bg-muted block w-full cursor-pointer rounded-lg p-5 text-left transition-colors outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]">
+        <p className="text-muted-foreground text-xs">{project.period}</p>
+        <p className="text-foreground mt-1 flex items-start gap-1 text-sm font-medium">
+          <span className="min-w-0">{project.title}</span>
+          <ChevronRight className="text-muted-foreground mt-0.5 size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+        </p>
+        {project.metrics && project.metrics.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {project.metrics.map((metric) => (
+              <span
+                key={metric}
+                className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs"
+              >
+                {metric}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {project.tags && project.tags.length > 0 && (
+          <p className="text-muted-foreground mt-3 text-xs">{project.tags.join(' · ')}</p>
+        )}
+      </DrawerTrigger>
+
+      <DrawerContent>
+        <DrawerHeader className="border-b pr-14">
+          <p className="text-muted-foreground text-xs">{project.period}</p>
+          <DrawerTitle>{project.title}</DrawerTitle>
+          {project.role && <DrawerDescription>{project.role}</DrawerDescription>}
+          {project.links && project.links.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {project.links.map((link) => (
+                <a
+                  key={link.url}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-muted text-foreground hover:bg-accent inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs transition-colors outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                >
+                  {link.label}
+                  <ExternalLink className="size-3 shrink-0" />
+                </a>
+              ))}
+            </div>
+          )}
+          <DrawerClose
+            aria-label="닫기"
+            className="text-muted-foreground hover:bg-accent hover:text-foreground absolute top-5 right-5 cursor-pointer rounded-md p-1.5 transition-colors outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+          >
+            <X className="size-4" />
+          </DrawerClose>
+        </DrawerHeader>
+
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">
+          <p className="text-muted-foreground mb-4 text-sm leading-relaxed">{project.summary}</p>
+
+          {project.goal && (
+            <p className="text-muted-foreground mb-4 text-sm">
+              <span className="text-foreground font-medium">Goal</span> · {project.goal}
+            </p>
+          )}
+
+          {project.metrics && project.metrics.length > 0 && (
+            <div className="mb-6 flex flex-wrap gap-1.5">
+              {project.metrics.map((metric) => (
+                <span
+                  key={metric}
+                  className="bg-muted text-foreground rounded-full px-2 py-0.5 text-xs"
+                >
+                  {metric}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-6">
+            {sections.map((section) => (
+              <section key={section.heading}>
+                <h3 className="text-foreground text-sm font-semibold">{section.heading}</h3>
+                {section.body && (
+                  <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                    {section.body}
+                  </p>
+                )}
+                {section.bullets && section.bullets.length > 0 && (
+                  <ul className="text-muted-foreground mt-2 list-disc space-y-1.5 pl-4 text-sm leading-relaxed">
+                    {section.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                )}
+                {section.quote && (
+                  <blockquote className="border-foreground/20 text-foreground mt-3 border-l-2 pl-3 text-sm leading-relaxed italic">
+                    {section.quote}
+                  </blockquote>
+                )}
+              </section>
+            ))}
+          </div>
+
+        </div>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
+// 커리어 항목 요약. 나열할 프로젝트가 없는 항목은 드로어 없이 텍스트로만 보여준다.
+function CareerDrawer({ entry, isEducation }: { entry: CareerEntry; isEducation: boolean }) {
+  const projects = entry.projects ?? []
+
+  if (projects.length === 0) {
+    return (
+      <>
+        <p className="leading-snug">
+          <span className="text-foreground font-medium">
+            {entry.company} {isEducation ? '-' : '·'} {entry.role}
+          </span>
+        </p>
+        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{entry.domain}</p>
+        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+          {entry.period} ({entry.duration})
+        </p>
+      </>
+    )
+  }
+
+  return (
+    <Drawer swipeDirection="right">
+      <DrawerTrigger className="group -mx-2 -my-1 block w-full cursor-pointer rounded-md px-2 py-1 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-ring/50 focus-visible:ring-[3px]">
+        <p className="flex items-center gap-1 leading-snug">
+          <span className="text-foreground font-medium">
+            {entry.company} {isEducation ? '-' : '·'} {entry.role}
+          </span>
+          <ChevronRight className="text-muted-foreground size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+        </p>
+        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{entry.domain}</p>
+        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+          {entry.period} ({entry.duration})
+        </p>
+      </DrawerTrigger>
+
+      <DrawerContent>
+        <DrawerHeader className="border-b pr-14">
+          <p className="text-muted-foreground text-xs">
+            {entry.period} ({entry.duration})
+          </p>
+          <DrawerTitle>{entry.company}</DrawerTitle>
+          <DrawerDescription>
+            {entry.role} · {entry.domain}
+          </DrawerDescription>
+          <DrawerClose
+            aria-label="닫기"
+            className="text-muted-foreground hover:bg-accent hover:text-foreground absolute top-5 right-5 cursor-pointer rounded-md p-1.5 transition-colors outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+          >
+            <X className="size-4" />
+          </DrawerClose>
+        </DrawerHeader>
+
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">
+          {entry.description && (
+            <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
+              {entry.description}
+            </p>
+          )}
+
+          <ul className="space-y-3">
+            {projects.map((project) => (
+              <li key={project.title}>
+                <ProjectCard project={project} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
 export default function Career() {
   const sorted = [...career].sort((a, b) => b.startDate.localeCompare(a.startDate))
   const markers = buildMarkers(sorted)
@@ -184,21 +384,7 @@ export default function Career() {
               <div
                 className={`min-w-0 flex-1 pl-3 ${split ? 'pt-[25px]' : 'pt-4'} ${entry ? 'pb-6' : 'pb-3'}`}
               >
-                {entry && (
-                  <>
-                    <p className="leading-snug">
-                      <span className="text-foreground font-medium">
-                        {entry.company} {isEducation ? '-' : '·'} {entry.role}
-                      </span>
-                    </p>
-                    <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                      {entry.domain}
-                    </p>
-                    <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                      {entry.period} ({entry.duration})
-                    </p>
-                  </>
-                )}
+                {entry && <CareerDrawer entry={entry} isEducation={isEducation} />}
               </div>
             </div>
           )
