@@ -14,7 +14,7 @@ export const techupProjects: CareerProject[] = [
     links: [
       {
         label: '최종 발표 PPT (Figma)',
-        url: 'https://www.figma.com/deck/LaRGmGm4ki3R99JBciTnhz/Playball-%EC%B5%9C%EC%A2%85-%EB%B0%9C%ED%91%9C--Copy-?node-id=248-2557&viewport=-419%2C-130%2C0.1&t=vnw2SXTxeFqQuGjY-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1',
+        url: 'https://www.figma.com/deck/LaRGmGm4ki3R99JBciTnhz/Playball-%EC%B5%9C%EC%A2%85-%EB%B0%9C%ED%91%9C--Copy-?node-id=275-4383&viewport=-419%2C-130%2C0.1&t=cixhaTWunG3Vy57L-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1',
       },
     ],
     sections: [

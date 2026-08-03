@@ -84,7 +84,7 @@ const bookingModes = [
 ]
 
 const DECK_URL =
-  'https://www.figma.com/deck/LaRGmGm4ki3R99JBciTnhz/Playball-%EC%B5%9C%EC%A2%85-%EB%B0%9C%ED%91%9C--Copy-?node-id=3-355&p=f&viewport=428%2C-147%2C0.09&t=zN2ZO7pm0wtXTS96-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
+  'https://www.figma.com/deck/LaRGmGm4ki3R99JBciTnhz/Playball-%EC%B5%9C%EC%A2%85-%EB%B0%9C%ED%91%9C--Copy-?node-id=275-4383&viewport=-419%2C-130%2C0.1&t=cixhaTWunG3Vy57L-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
 
 const metaRows: { label: string; value: ReactNode }[] = [
   {
