@@ -14,8 +14,8 @@ export const profile = {
   email: 'lab.jehyun@gmail.com',
   avatarUrl: `${import.meta.env.BASE_URL}images/profile.png`,
   links: {
-    github: 'https://github.com/',
-    linkedin: 'https://www.linkedin.com/',
+    github: 'https://github.com/j-hyunn',
+    linkedin: 'https://www.linkedin.com/in/jehyunn',
     resume: '',
   },
 }
