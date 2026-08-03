@@ -15,6 +15,7 @@ import {
   type CareerEntry,
   type CareerProject,
 } from '@/data/career'
+import { useIsMobile } from '@/hooks/use-media-query'
 
 const monthAbbr = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -115,9 +116,11 @@ const dotClass: Record<Tone, string> = {
 // 프로젝트 카드. 카드 자체가 트리거라, 클릭하면 커리어 드로어 위로 중첩 드로어가 쌓인다.
 function ProjectCard({ project }: { project: CareerProject }) {
   const sections = project.sections ?? []
+  // 모바일에서는 바텀 시트처럼 아래에서 위로 올라오게 한다.
+  const isMobile = useIsMobile()
 
   return (
-    <Drawer swipeDirection="right">
+    <Drawer swipeDirection={isMobile ? 'down' : 'right'} showSwipeHandle={isMobile}>
       <DrawerTrigger className="group bg-muted/60 hover:bg-muted block w-full cursor-pointer rounded-lg p-5 text-left transition-colors outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]">
         <p className="text-muted-foreground text-sm">{project.period}</p>
         <p className="text-foreground mt-1 flex items-start gap-1 text-base font-medium">
@@ -143,7 +146,7 @@ function ProjectCard({ project }: { project: CareerProject }) {
       </DrawerTrigger>
 
       <DrawerContent>
-        <DrawerHeader className="border-b pr-14">
+        <DrawerHeader className="border-b pr-14 group-data-[swipe-axis=y]/drawer-popup:text-left">
           <p className="text-muted-foreground text-sm">{project.period}</p>
           <DrawerTitle className="text-xl">{project.title}</DrawerTitle>
           {project.role && (
@@ -229,6 +232,8 @@ function ProjectCard({ project }: { project: CareerProject }) {
 // 커리어 항목 요약. 나열할 프로젝트가 없는 항목은 드로어 없이 텍스트로만 보여준다.
 function CareerDrawer({ entry }: { entry: CareerEntry }) {
   const projects = entry.projects ?? []
+  // 모바일에서는 바텀 시트처럼 아래에서 위로 올라오게 한다.
+  const isMobile = useIsMobile()
 
   // 타이틀 / 포지션 / 분야·팀 / 재직 기간 순서로 쌓인다. 포지션이 없으면 그 줄만 빠진다.
   const meta = (
@@ -255,7 +260,7 @@ function CareerDrawer({ entry }: { entry: CareerEntry }) {
   }
 
   return (
-    <Drawer swipeDirection="right">
+    <Drawer swipeDirection={isMobile ? 'down' : 'right'} showSwipeHandle={isMobile}>
       <DrawerTrigger className="group -mx-2 -my-1 block w-full cursor-pointer rounded-md px-2 py-1 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-ring/50 focus-visible:ring-[3px]">
         <p className="flex items-center gap-1 leading-snug">
           <span className="text-foreground text-lg font-medium">{entry.company}</span>
@@ -265,7 +270,7 @@ function CareerDrawer({ entry }: { entry: CareerEntry }) {
       </DrawerTrigger>
 
       <DrawerContent>
-        <DrawerHeader className="border-b pr-14">
+        <DrawerHeader className="border-b pr-14 group-data-[swipe-axis=y]/drawer-popup:text-left">
           <p className="text-muted-foreground text-sm">
             {entry.period} ({entry.duration})
           </p>
