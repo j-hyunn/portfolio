@@ -1,17 +1,25 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import {
-  Briefcase,
-  FolderKanban,
-  Globe,
-  LayoutDashboard,
-  Link2,
-  Mail,
-  Menu,
-  X,
-} from 'lucide-react'
+import { Briefcase, FolderKanban, LayoutDashboard, Mail, Menu, X } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { profile } from '@/data/profile'
+
+// lucide-react v1에서 브랜드 아이콘이 제거되어 lucide 규격(24 viewBox)에 맞춰 직접 정의
+function GithubIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <path d="M12 .5a11.5 11.5 0 0 0-3.635 22.412c.575.106.786-.25.786-.556 0-.274-.01-1.0-.016-1.963-3.198.695-3.873-1.541-3.873-1.541-.523-1.328-1.277-1.682-1.277-1.682-1.044-.714.079-.699.079-.699 1.154.081 1.762 1.185 1.762 1.185 1.026 1.758 2.691 1.25 3.346.956.104-.743.401-1.25.73-1.538-2.553-.291-5.238-1.277-5.238-5.683 0-1.255.449-2.281 1.185-3.086-.119-.291-.514-1.461.112-3.045 0 0 .966-.309 3.166 1.179a11.02 11.02 0 0 1 2.882-.388c.978.005 1.963.133 2.883.388 2.198-1.488 3.163-1.179 3.163-1.179.627 1.584.232 2.754.114 3.045.738.805 1.183 1.831 1.183 3.086 0 4.417-2.689 5.389-5.25 5.674.413.355.78 1.056.78 2.129 0 1.537-.014 2.777-.014 3.155 0 .308.208.667.792.554A11.502 11.502 0 0 0 12 .5Z" />
+    </svg>
+  )
+}
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <path d="M20.45 20.45h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.355V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.284ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.45H3.555V9h3.564v11.45ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003Z" />
+    </svg>
+  )
+}
 
 const navItems = [
   { to: '/', label: 'Overview', icon: LayoutDashboard },
@@ -89,7 +97,7 @@ export function Sidebar() {
               aria-label="GitHub"
               className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground"
             >
-              <Link2 className="size-4" />
+              <GithubIcon className="size-4" />
             </a>
             <a
               href={profile.links.linkedin}
@@ -98,7 +106,7 @@ export function Sidebar() {
               aria-label="LinkedIn"
               className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground"
             >
-              <Globe className="size-4" />
+              <LinkedinIcon className="size-4" />
             </a>
           </div>
 
