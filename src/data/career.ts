@@ -1,3 +1,30 @@
+import { paprikaProjects } from './paprika-projects'
+import { techupProjects } from './techup-projects'
+
+// 카드를 클릭하면 열리는 중첩 드로어의 상세 본문 한 덩어리
+export type ProjectSection = {
+  heading: string
+  body?: string
+  bullets?: string[]
+  quote?: string
+}
+
+// 커리어 항목을 클릭하면 열리는 드로어에 카드로 나열되는 회사 프로젝트
+export type CareerProject = {
+  title: string
+  period: string
+  summary: string
+  role?: string
+  goal?: string
+  // 카드 하단에 뱃지로 노출되는 핵심 성과 지표
+  metrics?: string[]
+  tags?: string[]
+  // 중첩 드로어에서 보여줄 상세 내용
+  sections?: ProjectSection[]
+  // 상세 드로어 하단에 노출되는 외부 자료 링크
+  links?: { label: string; url: string }[]
+}
+
 export type CareerEntry = {
   type: 'work' | 'education'
   company: string
@@ -8,6 +35,7 @@ export type CareerEntry = {
   period: string
   duration: string
   description: string
+  projects?: CareerProject[]
 }
 
 export const careerIntro =
@@ -24,6 +52,7 @@ export const career: CareerEntry[] = [
     period: '2025.09 - 2026.04',
     duration: '7개월',
     description: '',
+    projects: techupProjects,
   },
   {
     type: 'work',
@@ -35,6 +64,7 @@ export const career: CareerEntry[] = [
     period: '2023.11 - 2025.09',
     duration: '1년 11개월',
     description: '데이터 기반 기능 기획 및 디자인, 고객사 인터뷰 / 시장조사, 일정 관리',
+    projects: paprikaProjects,
   },
   {
     type: 'work',

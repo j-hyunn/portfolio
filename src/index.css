@@ -116,6 +116,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    /* position: relative는 Base UI Drawer가 요구하는 설정 */
+    @apply bg-background text-foreground relative;
   }
 }
