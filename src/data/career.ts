@@ -28,7 +28,8 @@ export type CareerProject = {
 export type CareerEntry = {
   type: 'work' | 'education'
   company: string
-  role: string
+  // 교육 과정처럼 포지션이 없는 항목은 비워 두면 노출되지 않는다.
+  role?: string
   domain: string
   startDate: string
   endDate: string | null
@@ -44,8 +45,7 @@ export const careerIntro =
 export const career: CareerEntry[] = [
   {
     type: 'education',
-    company: 'Tech Up',
-    role: 'Product Management 1기',
+    company: '[Tech Up] Product Management 1기',
     domain: 'Bootcamp · KT Cloud',
     startDate: '2025-09',
     endDate: '2026-04',
