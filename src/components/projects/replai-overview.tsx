@@ -56,18 +56,18 @@ const metaRows: { label: string; value: ReactNode }[] = [
   },
   {
     label: 'Period',
-    value: '2026.03 ~ (운영 중) · v4.0 이력서 시스템 2026.07 추가',
+    value: '2026.03 ~ 2026.08 · v4.0 이력서 시스템 2026.07 추가',
   },
   {
     label: 'Links',
     value: (
       <a
-        href="https://replai-interview.vercel.app/about"
+        href="https://github.com/j-hyunn/Replai"
         target="_blank"
         rel="noreferrer"
         className="border-border hover:border-blue-400 hover:text-blue-700 inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors"
       >
-        ↗ 서비스
+        ↗ GitHub
       </a>
     ),
   },
@@ -114,7 +114,7 @@ export function ReplaiOverview() {
       {/* Hero */}
       <section>
         <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-          ◆ Vibe Coding · 운영 중
+          ◆ Vibe Coding
         </span>
 
         <div className="mt-5 flex items-baseline gap-3">
@@ -224,6 +224,11 @@ export function ReplaiOverview() {
               title="3가지 면접관 페르소나"
               body="탐색형·압박형·기술 검증형 + 커스텀 지침."
               why="목적이 명확한 연습을 위한 스타일 제어."
+            />
+            <Feature
+              title="음성 · 힌트 · 이어하기"
+              body="TTS 음성 질문과 마이크 STT 답변, 막히면 이력서 기반 모범 답안 힌트, 이탈해도 남은 시간·대화 복원."
+              why="힌트를 쓴 답변은 점수 상한 30점을 서버에서 강제."
             />
             <Feature
               title="3축 평가 리포트"
