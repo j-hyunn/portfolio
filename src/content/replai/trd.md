@@ -1,6 +1,6 @@
-**Technical Requirements Document v4.0** 작성일: 2026-07-30 | 상태: Draft | 이전 버전: TRD v3.5 (2026-05-20)
+**Technical Requirements Document v4.1** 작성일: 2026-08-02 | 상태: Draft | 이전 버전: TRD v4.0 (2026-07-30)
 
-> **본 버전의 기준:** 코드베이스(`main` = b330303, 2026-07-30)를 사실의 기준으로 삼아 전면 재작성했다.
+> **본 버전의 기준:** 코드베이스(`main` = dc6f0f7, 2026-08-02)를 사실의 기준으로 삼는다. v4.0(b330303)에서 전면 재작성한 뒤, 이후 변경분을 반영했다.
 > v3.5 문서에 기재됐던 Zod·p-limit·structured output·reevaluate는 실제 구현과 달라 정정했고, 마스터 이력서 시스템(§11)을 신설했다.
 > 섹션 번호가 v3.5와 달라졌다 — §11 이력서 시스템 신설로 이후 섹션이 밀렸다.
 
@@ -26,6 +26,7 @@
 |v3.3|2026-05-17|문서 normalize 백그라운드화: `after()` 분리, `normalize_status` 컬럼, `retryNormalizeAction`·`ensureNormalizedAction`·`getNormalizeStatusesAction`, normalize 전용 모델 `gemini-2.5-flash-lite`|
 |v3.5|2026-05-20|평가 파이프라인 결정성 강화: `interview_messages.kind` 컬럼 도입(마커 폐기), 질문별 단건 호출 병렬화, 런타임 타입 검증 + 재시도 3회, 서버 후처리 산술|
 |**v4.0**|**2026-07-30**|**이력서 시스템 신설(§11): `master_resumes`·`submitted_resumes` 테이블, 4단계 생성 파이프라인, 제출용 이력서 면접 컨텍스트 주입. Git 링크 기능 제거. 평가 타임아웃 예산 관리(§12). v3.5 기술 상세 정정 — Zod·p-limit·structured output·reevaluate는 실제로 존재하지 않음**|
+|**v4.1**|**2026-08-02**|**이력서 생성 파이프라인 런타임 검증(§11.3): `src/lib/resume/parse.ts` 신설, `callGeminiParsed`로 파싱·검증 실패도 재시도 대상에 포함**|
 
 ---
 
@@ -566,22 +567,29 @@ SubmittedResumeContent = MasterResume의 섹션들 + summary?: string   // summa
      → getMasterResume(user.id)  — 없으면 422
      → getUserAiConfig(user.id)  — BYOK 적용
 
-1단계  buildJdAnalysisPrompt()    → JdAnalysis        실패 시 502 "JD 분석에 실패했습니다"
-2단계  buildFilterPrompt()        → FilteredContent   실패 시 502 "이력서 필터링에 실패했습니다"
-3단계  buildRewritePrompt()       → RewrittenContent  실패 시 502 "문장 변환에 실패했습니다"
-4단계  buildFinalResumePrompt()   → raw               실패 시 502 "최종 이력서 생성에 실패했습니다"
+1단계  buildJdAnalysisPrompt()    → parseJdAnalysis              실패 시 502 "JD 분석에 실패했습니다"
+2단계  buildFilterPrompt()        → parseFilteredContent         실패 시 502 "이력서 필터링에 실패했습니다"
+3단계  buildRewritePrompt()       → parseSubmittedResumeContent  실패 시 502 "문장 변환에 실패했습니다"
+4단계  buildFinalResumePrompt()   → raw                          실패 시 502 "최종 이력서 생성에 실패했습니다"
 
 4단계 출력 파싱: ---RESUME_JSON--- … ---ANALYSIS--- … 구분자
-  ├─ RESUME_JSON 블록 파싱 성공 → content_json
-  └─ 실패 → 3단계 결과(RewrittenContent)를 그대로 사용 (canonical fallback)
-  ├─ ANALYSIS 블록 파싱 성공 → analysis_json
+  ├─ RESUME_JSON 블록이 parseSubmittedResumeContent 검증 통과 → content_json
+  └─ 파싱·검증 실패 → 같은 검증을 이미 통과한 3단계 결과를 그대로 사용 (canonical fallback)
+  ├─ ANALYSIS 블록 파싱 성공 → parseResumeAnalysis → analysis_json
   └─ 실패 → 빈 분석으로 저장 (hard failure 아님)
 
 → createSubmittedResume({ content_md: "", content_json, analysis_json })
 → { id } 반환
 ```
 
-**호출 재시도:** `callGemini()`가 단계마다 최대 3회. 실패 시 `1000ms × attempt` 대기 후 재시도. Gemini REST 직접 호출(ADK 미사용).
+**호출 재시도:** 1~3단계는 `callGeminiParsed()`, 4단계는 `callGemini()`로 호출한다. 단계마다 최대 3회, 실패 시 `1000ms × attempt` 대기 후 재시도. Gemini REST 직접 호출(ADK 미사용).
+
+**런타임 검증 (`src/lib/resume/parse.ts`) — v4.1:**
+- **도입 배경:** 각 단계의 LLM 출력을 `as` 캐스팅으로만 받아, 모델이 필드를 빠뜨리거나 이름을 바꾼 출력도 타입상 멀쩡한 채 DB까지 도달했다. 실제로 `summary` 키가 통째로 없는 제출용 이력서가 저장된 사례가 있었다.
+- **정책:** `lib/evaluation/parse.ts`와 동일하다. 안전하게 복구할 수 있으면 정규화하고, 핵심 내용이 없으면 `InvalidResumeOutputError`를 throw한다. 누락 배열은 `[]`, 누락 문자열은 `""`, 항목 `id` 누락은 `randomUUID()`로 채운다(UI가 key로 사용). degree·status·entry_type union은 안전한 기본값으로 둔다.
+- **빈 이력서 거부:** `parseSubmittedResumeContent`는 내용이 실질적으로 빈 이력서를 거부한다. 빈 이력서는 빈 문자열로 직렬화돼 면접 컨텍스트에서 조용히 사라지므로, DB 저장 전에 막는다.
+- **분석은 관대하게:** `parseResumeAnalysis`는 throw하지 않는다. 정보를 보여주는 탭만 채우므로, 비어 있어도 치명적이지 않다.
+- **검증을 재시도 루프 안으로:** 예전에는 `JSON.parse`가 `callGemini` 바깥에 있어서, Gemini가 200 응답으로 깨진 JSON을 주면 재시도 없이 그 단계가 즉시 502로 끝났다. `callGeminiParsed`는 파싱·검증 실패도 실패한 시도 한 번으로 취급한다. 단계당 네트워크 시도가 9회로 불어나지 않도록 안쪽 `callGemini` 재시도는 1회로 제한한다.
 
 ### 11.4 면접 컨텍스트 주입
 
@@ -929,4 +937,4 @@ submitted_resumes
 
 ---
 
-_본 문서는 코드베이스 `main` = b330303 (2026-07-30) 기준 v4.0이다. 문서와 구현이 어긋났던 항목은 §12(평가 파이프라인), §13.4(스키마 정합성), §15(스트리밍)에 명시했다._
+_본 문서는 코드베이스 `main` = dc6f0f7 (2026-08-02) 기준 v4.1이다. 문서와 구현이 어긋났던 항목은 §12(평가 파이프라인), §13.4(스키마 정합성), §15(스트리밍)에 명시했다._

@@ -33,7 +33,7 @@ export const projects: ProjectEntry[] = [
     subtitle: '리플레이',
     description:
       '하나의 마스터 이력서로 회사별 제출용 이력서를 만들고, 그 이력서를 그대로 읽은 AI 면접관과 모의면접까지 이어서 진행하는 서비스.',
-    period: '2026.03 ~ (운영 중)',
+    period: '2026.03 ~ 2026.08',
     tags: ['Next.js', 'Google ADK', 'Supabase', 'Gemini'],
     docs: [
       { slug: 'prd', title: 'PRD' },
