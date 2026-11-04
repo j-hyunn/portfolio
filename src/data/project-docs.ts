@@ -63,8 +63,18 @@ const wikiTargetToSlug: Record<string, Record<string, string>> = {
   },
 }
 
-/** 실재하지 않는 문서. 참조 목록에서 해당 줄을 통째로 제거한다. */
+/**
+ * 실재하지 않는 문서. 참조 목록에서 해당 줄을 통째로 제거한다.
+ * 키는 `[[...]]` 안의 원문 전체와 정확히 일치해야 한다 (경로 표기 포함).
+ */
 const missingDocs: Record<string, string[]> = {
+  replai: [
+    'Micro Projects/Replai/Decisions',
+    'Micro Projects/Replai/문제와 솔루션',
+    'Micro Projects/Replai/타겟 유저',
+    'Micro Projects/Replai/비즈니스 모델',
+    '서비스 소개서',
+  ],
   playball: ['기능 정책서'],
 }
 

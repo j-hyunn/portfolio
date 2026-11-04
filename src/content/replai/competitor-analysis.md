@@ -177,11 +177,3 @@ Replai의 목표 좌표: **"Final Round AI의 통합성 + 무료"**
 - 원티드 이력서 코칭의 출력 품질 — 개조식 재작성 수준인지 문구 제안 수준인지
 - 각 서비스의 무료 사용 한도 (Replai 무료 포지셔닝의 실효성 판단)
 
----
-
-## 관련 문서
-
-- [[Micro Projects/Replai/문제와 솔루션]] — 시장 문제 정의
-- [[Micro Projects/Replai/타겟 유저]] — 목표 사용자 상세
-- [[Micro Projects/Replai/비즈니스 모델]] — 수익화 전략
-- [[서비스 소개서]] — Replai 한 장 요약
